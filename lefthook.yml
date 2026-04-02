@@ -1,0 +1,18 @@
+pre-commit:
+  parallel: true
+  commands:
+    prettier:
+      run: bun format -- {staged_files}
+      glob: "*.{ts,js,json}"
+    eslint:
+      run: bun lint -- {staged_files}
+      glob: "src/**/*.{ts,js}"
+    tsc:
+      run: bun tsc --noEmit
+      glob: "src/**/*.{ts,js}"
+
+commit-msg:
+  parallel: true
+  commands:
+    commitlint:
+      run: bun commitlint --edit $1
