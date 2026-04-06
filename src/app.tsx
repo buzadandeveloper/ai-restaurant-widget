@@ -1,7 +1,7 @@
-import { AiAgentWidget } from "./lib/components/ai-widget";
+import { AiAgentWidget } from "./lib/components/ai-agent-widget";
 
 function App() {
-  return <AiAgentWidget configKey="default" />;
+  return <AiAgentWidget configKey="00000" />;
 }
 
 export default App;

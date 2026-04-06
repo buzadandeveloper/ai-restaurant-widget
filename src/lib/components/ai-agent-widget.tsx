@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { aiAgentService } from "../services/ai-agent/ai-agent-service";
 import { MicHintIcon, MicIcon, PauseIcon, SpeakerIcon } from "../icons";
-import "./ai-widget.css";
+import "./ai-agent-widget.css";
 
 interface AiAgentWidgetProps {
   configKey: string;
