@@ -1,9 +1,15 @@
 import type { SessionParams, SessionResponse } from "./ai-agent-types";
-import { apiClient } from "../api-client";
+import { ApiClient } from "../api-client/api-client";
 
-class AiAgentService {
+export class AiAgentService {
+  private readonly apiClient: ApiClient;
+
+  constructor(apiClient: ApiClient) {
+    this.apiClient = apiClient;
+  }
+
   createSession = (params: SessionParams): Promise<SessionResponse> =>
-    apiClient.post(
+    this.apiClient.post(
       "/api/ai-agent/session",
       {},
       {
@@ -13,26 +19,27 @@ class AiAgentService {
       },
     );
 
-  startSdp = (sdp: string, token: string) =>
-    apiClient.post<string>("https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17", sdp, {
+  startSdp = (url: string, sdp: string | undefined, token: string) => {
+    if (!url || !sdp || !token) return;
+
+    return this.apiClient.post<string>(url, sdp, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/sdp",
       },
       responseType: "text",
     });
+  };
 
   // Generic tool executor
   executeTool = async (toolName: string, args: any) => {
     const endpoint = toolEndpoints[toolName];
 
-    if (!endpoint) throw new Error(`Unknown tool: ${toolName}`);
+    if (!endpoint) console.error(`Unknown tool: ${toolName}`);
 
-    return apiClient.post(endpoint, args);
+    return this.apiClient.post(endpoint, args);
   };
 }
-
-export const aiAgentService = new AiAgentService();
 
 const toolEndpoints: Record<string, string> = {
   create_order: "/api/ai-agent/tool/create-order",

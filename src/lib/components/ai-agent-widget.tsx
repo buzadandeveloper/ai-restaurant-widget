@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { aiAgentService } from "../services/ai-agent/ai-agent-service";
+import { AiAgentService, ApiClient } from "../services";
 import { MicHintIcon, MicIcon, PauseIcon, SpeakerIcon } from "../icons";
 import "./ai-agent-widget.css";
 
 interface AiAgentWidgetProps {
   configKey: string;
+  url: string;
+  aiProviderUrl: string;
 }
 
-export const AiAgentWidget = ({ configKey }: AiAgentWidgetProps) => {
+export const AiAgentWidget = ({ configKey, url, aiProviderUrl }: AiAgentWidgetProps) => {
+  const apiClient = new ApiClient(url);
+  const aiAgentService = new AiAgentService(apiClient);
+
   // ── Session state ──────────────────────────────────────────
   const [sessionState, setSessionState] = useState({ isActive: false, isListening: false, isSpeaking: false });
   // ── Waveform bars ──────────────────────────────────────────
@@ -17,6 +22,7 @@ export const AiAgentWidget = ({ configKey }: AiAgentWidgetProps) => {
   const animFrameRef = useRef<number | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const aiSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
 
   // ── WebRTC refs ────────────────────────────────────────────
   const pcRef = useRef<RTCPeerConnection | null>(null);
@@ -72,12 +78,26 @@ export const AiAgentWidget = ({ configKey }: AiAgentWidgetProps) => {
     animFrameRef.current = requestAnimationFrame(tick);
   }, []);
 
+  // ── Connect AI output stream to the existing analyser ─────
+  const connectAiStream = useCallback((stream: MediaStream) => {
+    const ctx = audioCtxRef.current;
+    const analyser = analyserRef.current;
+    if (!ctx || !analyser) return;
+    // Disconnect any previous AI source
+    aiSourceRef.current?.disconnect();
+    const aiSource = ctx.createMediaStreamSource(stream);
+    aiSource.connect(analyser);
+    aiSourceRef.current = aiSource;
+  }, []);
+
   // ── Stop waveform animation ────────────────────────────────
   const stopWaveform = useCallback(() => {
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    aiSourceRef.current?.disconnect();
     analyserRef.current?.disconnect();
     audioCtxRef.current?.close();
     animFrameRef.current = null;
+    aiSourceRef.current = null;
     analyserRef.current = null;
     audioCtxRef.current = null;
     setBars(Array(BAR_COUNT).fill(BASE_HEIGHT));
@@ -92,7 +112,7 @@ export const AiAgentWidget = ({ configKey }: AiAgentWidgetProps) => {
       // STEP 1: Create AI session
       const data = await aiAgentService.createSession({ configKey });
       const EPHEMERAL_KEY = data?.client_secret?.value;
-      if (!EPHEMERAL_KEY) throw new Error("Missing EPHEMERAL_KEY in response");
+      if (!EPHEMERAL_KEY) console.error("Missing EPHEMERAL_KEY in response");
 
       // STEP 2: WebRTC peer connection
       const pc = new RTCPeerConnection();
@@ -103,6 +123,8 @@ export const AiAgentWidget = ({ configKey }: AiAgentWidgetProps) => {
           audioRef.current.srcObject = event.streams[0];
           audioRef.current.play().catch(() => {});
         }
+        // Connect AI audio stream to the analyser so waveform reacts while AI speaks
+        connectAiStream(event.streams[0]);
         setSessionState((prev) => ({ ...prev, isListening: false, isSpeaking: true }));
       };
 
@@ -141,19 +163,19 @@ export const AiAgentWidget = ({ configKey }: AiAgentWidgetProps) => {
             const callId: string = msg.call_id;
             const args = JSON.parse(toolArgsBufferRef.current || "{}");
 
-            console.log("🛠️ Tool call:", toolName);
-            console.log("📨 Arguments:", args);
-            console.log("🔑 Call ID:", callId);
+            console.log("Tool call:", toolName);
+            console.log("Arguments:", args);
+            console.log("Call ID:", callId);
 
             if (!toolName || !callId) {
-              console.error("❌ Missing tool name or call_id");
+              console.error("Missing tool name or call_id");
               toolArgsBufferRef.current = "";
               return;
             }
 
             try {
               const result = await aiAgentService.executeTool(toolName, args);
-              console.log("✅ Tool result:", result);
+              console.log("Tool result:", result);
 
               dc.send(
                 JSON.stringify({
@@ -168,7 +190,7 @@ export const AiAgentWidget = ({ configKey }: AiAgentWidgetProps) => {
               dc.send(JSON.stringify({ type: "response.create" }));
             } catch (err: unknown) {
               const message = err instanceof Error ? err.message : "Tool execution failed";
-              console.error("❌ Tool execution failed:", err);
+              console.error("Tool execution failed:", err);
 
               dc.send(
                 JSON.stringify({
@@ -187,10 +209,10 @@ export const AiAgentWidget = ({ configKey }: AiAgentWidgetProps) => {
           }
 
           if (!msg.type?.startsWith("response.function_call_arguments")) {
-            console.log("📥 AI event:", msg.type);
+            console.log("AI event:", msg.type);
           }
         } catch (err) {
-          console.error("❌ Error parsing message:", err);
+          console.error("Error parsing message:", err);
         }
       };
 
@@ -198,18 +220,18 @@ export const AiAgentWidget = ({ configKey }: AiAgentWidgetProps) => {
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
 
-      const answerSDP = await aiAgentService.startSdp(offer.sdp!, EPHEMERAL_KEY);
+      const answerSDP = await aiAgentService.startSdp(aiProviderUrl, offer.sdp, EPHEMERAL_KEY);
 
-      if (!answerSDP) throw new Error("OpenAI connection error");
+      if (!answerSDP) console.error("OpenAI connection error");
       await pc.setRemoteDescription({ type: "answer", sdp: answerSDP });
 
-      console.log("✅ Connected to AI Agent!");
+      console.log("Connected to AI Agent!");
     } catch (err) {
-      console.error("❌ Error starting:", err);
+      console.error("Error starting:", err);
       stopWaveform();
       setSessionState((prev) => ({ ...prev, isActive: false, isListening: false, isSpeaking: false }));
     }
-  }, [isActive, configKey, startWaveform, stopWaveform]);
+  }, [isActive, configKey, aiProviderUrl, aiAgentService, startWaveform, stopWaveform, connectAiStream]);
 
   // ── Stop conversation ──────────────────────────────────────
   const stopConversation = useCallback(() => {
@@ -229,7 +251,7 @@ export const AiAgentWidget = ({ configKey }: AiAgentWidgetProps) => {
 
     stopWaveform();
     setSessionState({ isActive: false, isListening: false, isSpeaking: false });
-    console.log("🛑 Session stopped");
+    console.log("Session stopped");
   }, [stopWaveform]);
 
   // ── Button click handler ───────────────────────────────────
@@ -245,7 +267,6 @@ export const AiAgentWidget = ({ configKey }: AiAgentWidgetProps) => {
   // ── Cleanup on unmount ─────────────────────────────────────
   useEffect(() => {
     return () => stopConversation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

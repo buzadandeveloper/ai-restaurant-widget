@@ -1,12 +1,12 @@
-import $axios from "axios";
+import axios from "axios";
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
 
-class ApiClient {
+export class ApiClient {
   private readonly axiosInstance: AxiosInstance;
 
-  constructor() {
-    this.axiosInstance = $axios.create({
-      baseURL: import.meta.env.VITE_BASE_URL,
+  constructor(url: string) {
+    this.axiosInstance = axios.create({
+      baseURL: url,
     });
   }
 
@@ -16,5 +16,3 @@ class ApiClient {
     return response.data;
   }
 }
-
-export const apiClient = new ApiClient();

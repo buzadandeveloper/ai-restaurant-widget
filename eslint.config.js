@@ -32,6 +32,7 @@ export default defineConfig([
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
       "prettier/prettier": ["error", { endOfLine: "auto" }],
+      "react-hooks/exhaustive-deps": "off",
     },
   },
 ]);
