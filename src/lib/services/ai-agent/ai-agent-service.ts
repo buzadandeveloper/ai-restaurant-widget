@@ -13,6 +13,10 @@ export class AiAgentService {
       "/api/ai-agent/session",
       {},
       {
+        headers: {
+          "X-AI-Provider-URL": params.aiProviderUrl,
+          "X-AI-Provider-Key": params.aiProviderApiKey,
+        },
         params: {
           configKey: params.configKey,
         },

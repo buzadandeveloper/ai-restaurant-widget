@@ -7,9 +7,17 @@ interface AiAgentWidgetProps {
   configKey: string;
   url: string;
   aiProviderUrl: string;
+  aiProviderApiKey: string;
+  aiWsProviderUrl: string;
 }
 
-export const AiAgentWidget = ({ configKey, url, aiProviderUrl }: AiAgentWidgetProps) => {
+export const AiAgentWidget = ({
+  configKey,
+  url,
+  aiProviderUrl,
+  aiProviderApiKey,
+  aiWsProviderUrl,
+}: AiAgentWidgetProps) => {
   const apiClient = new ApiClient(url);
   const aiAgentService = new AiAgentService(apiClient);
 
@@ -110,7 +118,7 @@ export const AiAgentWidget = ({ configKey, url, aiProviderUrl }: AiAgentWidgetPr
 
     try {
       // STEP 1: Create AI session
-      const data = await aiAgentService.createSession({ configKey });
+      const data = await aiAgentService.createSession({ configKey, aiProviderUrl, aiProviderApiKey });
       const EPHEMERAL_KEY = data?.client_secret?.value;
       if (!EPHEMERAL_KEY) console.error("Missing EPHEMERAL_KEY in response");
 
@@ -137,6 +145,11 @@ export const AiAgentWidget = ({ configKey, url, aiProviderUrl }: AiAgentWidgetPr
       // STEP 3: Data channel for tool calls
       const dc = pc.createDataChannel("oai-events");
       dcRef.current = dc;
+
+      // Trigger the AI to speak first as soon as the data channel is open
+      dc.onopen = () => {
+        dc.send(JSON.stringify({ type: "response.create" }));
+      };
 
       dc.onmessage = async (e) => {
         try {
@@ -220,7 +233,7 @@ export const AiAgentWidget = ({ configKey, url, aiProviderUrl }: AiAgentWidgetPr
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
 
-      const answerSDP = await aiAgentService.startSdp(aiProviderUrl, offer.sdp, EPHEMERAL_KEY);
+      const answerSDP = await aiAgentService.startSdp(aiWsProviderUrl, offer.sdp, EPHEMERAL_KEY);
 
       if (!answerSDP) console.error("OpenAI connection error");
       await pc.setRemoteDescription({ type: "answer", sdp: answerSDP });
@@ -231,7 +244,17 @@ export const AiAgentWidget = ({ configKey, url, aiProviderUrl }: AiAgentWidgetPr
       stopWaveform();
       setSessionState((prev) => ({ ...prev, isActive: false, isListening: false, isSpeaking: false }));
     }
-  }, [isActive, configKey, aiProviderUrl, aiAgentService, startWaveform, stopWaveform, connectAiStream]);
+  }, [
+    isActive,
+    configKey,
+    aiWsProviderUrl,
+    aiProviderApiKey,
+    aiProviderUrl,
+    aiAgentService,
+    startWaveform,
+    stopWaveform,
+    connectAiStream,
+  ]);
 
   // ── Stop conversation ──────────────────────────────────────
   const stopConversation = useCallback(() => {

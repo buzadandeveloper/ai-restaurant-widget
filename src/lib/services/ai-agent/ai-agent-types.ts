@@ -6,4 +6,6 @@ export type SessionResponse = {
 
 export type SessionParams = {
   configKey: string;
+  aiProviderUrl: string;
+  aiProviderApiKey: string;
 };
