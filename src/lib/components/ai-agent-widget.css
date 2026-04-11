@@ -206,6 +206,16 @@
   pointer-events: none;
 }
 
+.vb-glow--listening {
+  background-color: rgba(224, 85, 85, 0.45);
+}
+.vb-glow--speaking {
+  background-color: rgba(46, 184, 122, 0.45);
+}
+.vb-glow--idle {
+  background-color: rgba(232, 98, 30, 0.4);
+}
+
 .vb-glow--active {
   opacity: 0.65;
 }
@@ -267,4 +277,20 @@
 
 .vb-btn:active {
   transform: scale(0.95);
+}
+
+.vb-btn--listening {
+  background: linear-gradient(to bottom right, #c0392b, #8e2519);
+  box-shadow: 0 8px 28px rgba(224, 85, 85, 0.45),
+              0 2px 8px rgba(224, 85, 85, 0.45);
+}
+.vb-btn--speaking {
+  background: linear-gradient(to bottom right, #1a9960, #116644);
+  box-shadow: 0 8px 28px rgba(46, 184, 122, 0.45),
+              0 2px 8px rgba(46, 184, 122, 0.45);
+}
+.vb-btn--idle {
+  background: linear-gradient(to bottom right, #e8621e, #c04a10);
+  box-shadow: 0 8px 28px rgba(232, 98, 30, 0.4),
+              0 2px 8px rgba(232, 98, 30, 0.4);
 }

@@ -44,22 +44,10 @@ export const AiAgentWidget = ({
   const { isActive, isListening, isSpeaking } = sessionState;
 
   const theme = isListening
-    ? {
-        glow: "bg-[rgba(224,85,85,0.45)]",
-        button:
-          "bg-linear-to-br from-[#c0392b] to-[#8e2519] shadow-[0_8px_28px_rgba(224,85,85,0.45),0_2px_8px_rgba(224,85,85,0.45)]",
-      }
+    ? { glow: "vb-glow--listening", button: "vb-btn--listening" }
     : isSpeaking
-      ? {
-          glow: "bg-[rgba(46,184,122,0.45)]",
-          button:
-            "bg-linear-to-br from-[#1a9960] to-[#116644] shadow-[0_8px_28px_rgba(46,184,122,0.45),0_2px_8px_rgba(46,184,122,0.45)]",
-        }
-      : {
-          glow: "bg-[rgba(232,98,30,0.4)]",
-          button:
-            "bg-linear-to-br from-[#e8621e] to-[#c04a10] shadow-[0_8px_28px_rgba(232,98,30,0.4),0_2px_8px_rgba(232,98,30,0.4)]",
-        };
+      ? { glow: "vb-glow--speaking", button: "vb-btn--speaking" }
+      : { glow: "vb-glow--idle", button: "vb-btn--idle" };
 
   // ── Start waveform animation ───────────────────────────────
   const startWaveform = useCallback((stream: MediaStream) => {
