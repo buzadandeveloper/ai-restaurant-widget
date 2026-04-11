@@ -7,6 +7,7 @@
   border-radius: 50%;
   border-width: 1.5px;
   border-style: solid;
+  border-color: #e05555;
   opacity: 0;
   pointer-events: none;
 }
@@ -22,6 +23,13 @@
   }
 }
 
+.ripple-ring--1 {
+  animation: rpl 2s ease-out infinite;
+}
+.ripple-ring--2 {
+  animation: rpl 2s ease-out infinite 0.65s;
+}
+
 @keyframes idlePulse {
   0% {
     transform: scale(1);
@@ -31,4 +39,232 @@
     transform: scale(1.9);
     opacity: 0;
   }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.vb-root {
+  position: fixed;
+  bottom: 2rem;
+  right: 1.75rem;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+}
+
+.vb-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  background-color: #161210;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  transition: all 0.4s ease-in-out;
+  /* py-3.5 always present */
+  padding-top: 0.875rem;
+  padding-bottom: 0.875rem;
+}
+
+.vb-panel--active {
+  width: 16rem;
+  opacity: 1;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-right: 0.75rem;
+}
+
+.vb-panel--collapsed {
+  width: 0;
+  opacity: 0;
+  padding-left: 0;
+  padding-right: 0;
+  margin-right: 0;
+}
+
+.vb-panel--listening {
+  border-color: rgba(224, 85, 85, 0.35);
+}
+.vb-panel--speaking {
+  border-color: rgba(46, 184, 122, 0.35);
+}
+.vb-panel--idle {
+  border-color: rgba(232, 98, 30, 0.35);
+}
+
+.vb-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.vb-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.vb-dot--listening {
+  background-color: #e05555;
+  box-shadow: 0 0 7px #e05555;
+}
+
+.vb-dot--speaking {
+  background-color: #2eb87a;
+  box-shadow: 0 0 7px #2eb87a;
+}
+
+.vb-status-label {
+  font-size: 12px;
+  letter-spacing: 0.07em;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  transition: color 0.3s;
+}
+
+.vb-status-label--listening {
+  color: #e05555;
+}
+.vb-status-label--speaking {
+  color: #2eb87a;
+}
+
+.vb-waveform {
+  position: relative;
+  height: 52px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.vb-bars {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vb-bar {
+  width: 3px;
+  border-radius: 9999px;
+  transition: height 55ms linear;
+}
+
+.vb-bar--listening {
+  background-color: #e05555;
+}
+.vb-bar--speaking {
+  background-color: #2eb87a;
+}
+
+.vb-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 20px;
+  white-space: nowrap;
+}
+
+.vb-hint-text {
+  font-size: 11px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  color: #5a4a3a;
+}
+
+.vb-btn-wrap {
+  position: relative;
+  width: 62px;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vb-glow {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  filter: blur(14px);
+  transition: all 0.3s;
+  pointer-events: none;
+}
+
+.vb-glow--active {
+  opacity: 0.65;
+}
+.vb-glow--inactive {
+  opacity: 0.3;
+}
+
+.vb-spin-ring {
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  border: 1.5px dashed transparent;
+  pointer-events: none;
+  transition: all 0.3s;
+}
+
+.vb-spin-ring--listening {
+  border-color: #e05555;
+}
+.vb-spin-ring--speaking {
+  border-color: #2eb87a;
+}
+.vb-spin-ring--idle {
+  border-color: #e8621e;
+}
+
+.vb-spin-ring--active {
+  opacity: 0.55;
+  animation: spin 3s linear infinite;
+}
+
+.vb-spin-ring--inactive {
+  opacity: 0;
+  animation: none;
+}
+
+.vb-idle-ring {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1.5px solid #e8621e;
+  pointer-events: none;
+  animation: idlePulse 2s ease-out infinite;
+}
+
+.vb-btn {
+  position: relative;
+  z-index: 10;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.vb-btn:active {
+  transform: scale(0.95);
 }

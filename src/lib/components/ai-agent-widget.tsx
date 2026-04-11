@@ -297,29 +297,27 @@ export const AiAgentWidget = ({
       {/* Hidden audio element for AI voice output */}
       <audio ref={audioRef} autoPlay hidden />
 
-      <div className="fixed bottom-8 right-7 z-50 flex items-center">
+      <div className="vb-root">
         {/* ── Voice listener panel ── */}
         <div
           className={`
-            flex flex-col gap-2.5 overflow-hidden rounded-[20px] border bg-[#161210]
-            shadow-[0_16px_48px_rgba(0,0,0,0.6)]
-            transition-all duration-400 ease-in-out
-            ${isActive ? "w-64 opacity-100 px-4 py-3.5 mr-3" : "w-0 opacity-0 px-0 py-3.5 mr-0"}
-            ${isListening ? "border-[#e05555]/35" : isSpeaking ? "border-[#2eb87a]/35" : "border-[#e8621e]/35"}
+            vb-panel
+            ${isActive ? "vb-panel--active" : "vb-panel--collapsed"}
+            ${isListening ? "vb-panel--listening" : isSpeaking ? "vb-panel--speaking" : "vb-panel--idle"}
           `}
         >
           {/* Status row */}
-          <div className="flex items-center gap-2 whitespace-nowrap">
+          <div className="vb-status">
             <span
               className={`
-                w-1.75 h-1.75 rounded-full shrink-0 transition-all duration-300
-                ${isListening ? "bg-[#e05555] shadow-[0_0_7px_#e05555]" : "bg-[#2eb87a] shadow-[0_0_7px_#2eb87a]"}
+                vb-dot
+                ${isListening ? "vb-dot--listening" : "vb-dot--speaking"}
               `}
             />
             <span
               className={`
-                text-[12px] tracking-[0.07em] font-serif italic transition-colors duration-300
-                ${isListening ? "text-[#e05555]" : "text-[#2eb87a]"}
+                vb-status-label
+                ${isListening ? "vb-status-label--listening" : "vb-status-label--speaking"}
               `}
             >
               {isListening ? "Listening..." : "Speaking..."}
@@ -327,23 +325,23 @@ export const AiAgentWidget = ({
           </div>
 
           {/* Waveform visualizer */}
-          <div className="relative h-13 rounded-[10px] bg-white/3 flex items-center justify-center overflow-hidden">
+          <div className="vb-waveform">
             {/* Ripple rings — listening only */}
             {isListening && (
               <>
-                <span className="ripple-ring border-[#e05555] animate-[rpl_2s_ease-out_infinite]" />
-                <span className="ripple-ring border-[#e05555] animate-[rpl_2s_ease-out_infinite_0.65s]" />
+                <span className="ripple-ring ripple-ring--1" />
+                <span className="ripple-ring ripple-ring--2" />
               </>
             )}
             {/* Bars */}
-            <div className="relative z-10 flex items-center gap-1">
+            <div className="vb-bars">
               {bars.map((bar, index) => (
                 <div
                   key={index}
                   style={{ height: getHeight(bar) }}
                   className={`
-                    w-0.75 rounded-full transition-[height] duration-55 ease-linear
-                    ${isListening ? "bg-[#e05555]" : "bg-[#2eb87a]"}
+                    vb-bar
+                    ${isListening ? "vb-bar--listening" : "vb-bar--speaking"}
                   `}
                 />
               ))}
@@ -351,47 +349,41 @@ export const AiAgentWidget = ({
           </div>
 
           {/* Hint label */}
-          <div className="flex items-center gap-1.5 min-h-5 whitespace-nowrap">
+          <div className="vb-hint">
             {isListening ? <MicHintIcon /> : <SpeakerIcon />}
-            <span className="text-[11px] font-serif italic text-[#5a4a3a]">
-              {isListening ? "Speak now…" : "AI is responding…"}
-            </span>
+            <span className="vb-hint-text">{isListening ? "Speak now…" : "AI is responding…"}</span>
           </div>
         </div>
 
         {/* ── Circle button ── */}
-        <div className="relative w-15.5 h-15.5 flex items-center justify-center shrink-0">
+        <div className="vb-btn-wrap">
           {/* Blur glow */}
           <div
             className={`
-              absolute -inset-2 rounded-full blur-[14px] transition-all duration-300 pointer-events-none
+              vb-glow
               ${theme.glow}
-              ${isActive ? "opacity-65" : "opacity-30"}
+              ${isActive ? "vb-glow--active" : "vb-glow--inactive"}
             `}
           />
 
           {/* Spinning dashed ring */}
           <div
             className={`
-              absolute -inset-2.5 rounded-full border-[1.5px] border-dashed pointer-events-none
-              transition-all duration-300
-              ${isListening ? "border-[#e05555]" : isSpeaking ? "border-[#2eb87a]" : "border-[#e8621e]"}
-              ${isActive ? "opacity-55 animate-spin" : "opacity-0"}
+              vb-spin-ring
+              ${isListening ? "vb-spin-ring--listening" : isSpeaking ? "vb-spin-ring--speaking" : "vb-spin-ring--idle"}
+              ${isActive ? "vb-spin-ring--active" : "vb-spin-ring--inactive"}
             `}
             style={{ animationDuration: "3s" }}
           />
 
           {/* Idle pulse ring */}
-          {!isActive && (
-            <div className="absolute -inset-1.25 rounded-full border-[1.5px] border-[#e8621e] animate-[idlePulse_2s_ease-out_infinite] pointer-events-none" />
-          )}
+          {!isActive && <div className="vb-idle-ring" />}
 
           {/* Main button */}
           <button
             onClick={handleClick}
             className={`
-              relative z-10 w-15.5 h-15.5 rounded-full border-none flex items-center justify-center
-              cursor-pointer transition-all duration-300 active:scale-95
+              vb-btn
               ${theme.button}
             `}
           >
