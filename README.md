@@ -63,7 +63,7 @@ export default function App() {
       url="http://localhost:3000"
       aiProviderUrl="https://api.openai.com/v1/realtime/sessions"
       aiProviderApiKey="sk-proj-xxxxx"
-      aiWsProviderUrl="https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17"
+      aiRtcProviderUrl="https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17"
     />
   );
 }
@@ -75,13 +75,13 @@ That's it! The widget is now in your site.
 
 ## 📋 Props (Configuration)
 
-| Prop | Required | Example | Purpose |
-|------|----------|---------|---------|
-| `configKey` | ✅ | `acc_6d7a43da2e53aa74` | Connects to your restaurant in the backend |
-| `url` | ✅ | `http://localhost:3000` | Your backend API URL |
-| `aiProviderUrl` | ✅ | `https://api.openai.com/v1/realtime/sessions` | AI provider session endpoint |
+| Prop               | Required | Example | Purpose |
+|--------------------|----------|---------|---------|
+| `configKey`        | ✅ | `acc_6d7a43da2e53aa74` | Connects to your restaurant in the backend |
+| `url`              | ✅ | `http://localhost:3000` | Your backend API URL |
+| `aiProviderUrl`    | ✅ | `https://api.openai.com/v1/realtime/sessions` | AI provider session endpoint |
 | `aiProviderApiKey` | ✅ | `sk-proj-xxxxx` | Your AI provider API key |
-| `aiWsProviderUrl` | ✅ | `https://api.openai.com/v1/realtime?model=...` | AI provider WebRTC endpoint |
+| `aiRtcProviderUrl` | ✅ | `https://api.openai.com/v1/realtime?model=...` | AI provider WebRTC endpoint |
 
 ### How to Get Values
 
@@ -193,7 +193,7 @@ export default function YourWebsite() {
         url="YOUR_BACKEND_URL"
         aiProviderUrl="YOUR_AI_PROVIDER_URL"
         aiProviderApiKey="YOUR_API_KEY"
-        aiWsProviderUrl="YOUR_WEBSOCKET_URL"
+        aiRtcProviderUrl="YOUR_WEBSOCKET_URL"
       />
     </div>
   );
@@ -219,7 +219,7 @@ VITE_AI_WS_URL=https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-
   url={import.meta.env.VITE_BACKEND_URL}
   aiProviderUrl={import.meta.env.VITE_AI_PROVIDER_URL}
   aiProviderApiKey={import.meta.env.VITE_AI_PROVIDER_KEY}
-  aiWsProviderUrl={import.meta.env.VITE_AI_WS_URL}
+  aiRtcProviderUrl={import.meta.env.VITE_AI_WS_URL}
 />
 ```
 

@@ -8,7 +8,7 @@ interface AiAgentWidgetProps {
   url: string;
   aiProviderUrl: string;
   aiProviderApiKey: string;
-  aiWsProviderUrl: string;
+  aiRtcProviderUrl: string;
 }
 
 export const AiAgentWidget = ({
@@ -16,7 +16,7 @@ export const AiAgentWidget = ({
   url,
   aiProviderUrl,
   aiProviderApiKey,
-  aiWsProviderUrl,
+  aiRtcProviderUrl,
 }: AiAgentWidgetProps) => {
   const apiClient = new ApiClient(url);
   const aiAgentService = new AiAgentService(apiClient);
@@ -221,7 +221,7 @@ export const AiAgentWidget = ({
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
 
-      const answerSDP = await aiAgentService.startSdp(aiWsProviderUrl, offer.sdp, EPHEMERAL_KEY);
+      const answerSDP = await aiAgentService.startSdp(aiRtcProviderUrl, offer.sdp, EPHEMERAL_KEY);
 
       if (!answerSDP) console.error("OpenAI connection error");
       await pc.setRemoteDescription({ type: "answer", sdp: answerSDP });
@@ -235,7 +235,7 @@ export const AiAgentWidget = ({
   }, [
     isActive,
     configKey,
-    aiWsProviderUrl,
+    aiRtcProviderUrl,
     aiProviderApiKey,
     aiProviderUrl,
     aiAgentService,
