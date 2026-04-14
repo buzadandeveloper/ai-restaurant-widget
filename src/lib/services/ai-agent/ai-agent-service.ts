@@ -16,6 +16,8 @@ export class AiAgentService {
         headers: {
           "X-AI-Provider-URL": params.aiProviderUrl,
           "X-AI-Provider-Key": params.aiProviderApiKey,
+          "X-AI-Model": params.model,
+          "X-AI-Voice": params.voice,
         },
         params: {
           configKey: params.configKey,

@@ -64,6 +64,8 @@ export default function App() {
       aiProviderUrl="https://api.openai.com/v1/realtime/sessions"
       aiProviderApiKey="sk-proj-xxxxx"
       aiRtcProviderUrl="https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17"
+      model="gpt-4o-realtime-preview-2024-12-17"
+      voice="alloy"
     />
   );
 }
@@ -82,6 +84,8 @@ That's it! The widget is now in your site.
 | `aiProviderUrl`    | ✅ | `https://api.openai.com/v1/realtime/sessions` | AI provider session endpoint |
 | `aiProviderApiKey` | ✅ | `sk-proj-xxxxx` | Your AI provider API key |
 | `aiRtcProviderUrl` | ✅ | `https://api.openai.com/v1/realtime?model=...` | AI provider WebRTC endpoint |
+| `model`            | ✅ | `gpt-4o-realtime-preview-2024-12-17` | Realtime model sent to backend session creation |
+| `voice`            | ✅ | `alloy` | Voice preset sent to backend session creation |
 
 ### How to Get Values
 
@@ -194,6 +198,8 @@ export default function YourWebsite() {
         aiProviderUrl="YOUR_AI_PROVIDER_URL"
         aiProviderApiKey="YOUR_API_KEY"
         aiRtcProviderUrl="YOUR_WEBSOCKET_URL"
+        model="YOUR_MODEL"
+        voice="YOUR_VOICE"
       />
     </div>
   );
@@ -211,6 +217,8 @@ VITE_BACKEND_URL=http://localhost:3000
 VITE_AI_PROVIDER_URL=https://api.openai.com/v1/realtime/sessions
 VITE_AI_PROVIDER_KEY=sk-proj-xxxxx
 VITE_AI_WS_URL=https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17
+VITE_AI_MODEL=gpt-4o-realtime-preview-2024-12-17
+VITE_AI_VOICE=verse
 ```
 
 ```jsx
@@ -220,6 +228,8 @@ VITE_AI_WS_URL=https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-
   aiProviderUrl={import.meta.env.VITE_AI_PROVIDER_URL}
   aiProviderApiKey={import.meta.env.VITE_AI_PROVIDER_KEY}
   aiRtcProviderUrl={import.meta.env.VITE_AI_WS_URL}
+  model={import.meta.env.VITE_AI_MODEL}
+  voice={import.meta.env.VITE_AI_VOICE}
 />
 ```
 

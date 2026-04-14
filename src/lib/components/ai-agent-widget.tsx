@@ -9,6 +9,8 @@ interface AiAgentWidgetProps {
   aiProviderUrl: string;
   aiProviderApiKey: string;
   aiRtcProviderUrl: string;
+  model: string;
+  voice: string;
 }
 
 export const AiAgentWidget = ({
@@ -17,6 +19,8 @@ export const AiAgentWidget = ({
   aiProviderUrl,
   aiProviderApiKey,
   aiRtcProviderUrl,
+  model,
+  voice,
 }: AiAgentWidgetProps) => {
   const apiClient = new ApiClient(url);
   const aiAgentService = new AiAgentService(apiClient);
@@ -106,7 +110,7 @@ export const AiAgentWidget = ({
 
     try {
       // STEP 1: Create AI session
-      const data = await aiAgentService.createSession({ configKey, aiProviderUrl, aiProviderApiKey });
+      const data = await aiAgentService.createSession({ configKey, aiProviderUrl, aiProviderApiKey, model, voice });
       const EPHEMERAL_KEY = data?.client_secret?.value;
       if (!EPHEMERAL_KEY) console.error("Missing EPHEMERAL_KEY in response");
 
@@ -238,6 +242,8 @@ export const AiAgentWidget = ({
     aiRtcProviderUrl,
     aiProviderApiKey,
     aiProviderUrl,
+    model,
+    voice,
     aiAgentService,
     startWaveform,
     stopWaveform,

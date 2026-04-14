@@ -8,4 +8,6 @@ export type SessionParams = {
   configKey: string;
   aiProviderUrl: string;
   aiProviderApiKey: string;
+  model: string;
+  voice: string;
 };
